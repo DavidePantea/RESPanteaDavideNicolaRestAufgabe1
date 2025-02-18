@@ -15,8 +15,17 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) {
         List<NinjaEvent> ninjaEvents = readXml("src/ninja_events.xml");
+        selectByNumber(ninjaEvents, 30);
     }
 
+    private static void selectByNumber(List<NinjaEvent> ninjaEvents, Integer givenNumber){
+        for (NinjaEvent ninjaEvent : ninjaEvents){
+            if (ninjaEvent.getPowerLevel() >= givenNumber){
+                System.out.println(ninjaEvent.getCharacterName());
+            }
+        }
+
+    }
     private static List<NinjaEvent> readXml(String filepath) {
         List<NinjaEvent> ninjaEvents = new ArrayList<>();
         try {
