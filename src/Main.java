@@ -1,17 +1,51 @@
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
 // Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
 // then press Enter. You can now see whitespace characters in your code.
 public class Main {
     public static void main(String[] args) {
-        // Press Opt+Enter with your caret at the highlighted text to see how
-        // IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
-
-        // Press Ctrl+R or click the green arrow button in the gutter to run the code.
-        for (int i = 1; i <= 5; i++) {
-
-            // Press Ctrl+D to start debugging your code. We have set one breakpoint
-            // for you, but you can always add more by pressing Cmd+F8.
-            System.out.println("i hello = " + i);
-        }
+        List<NinjaEvent> ninjaEvents = readXml("src/ninja_events.xml");
     }
+
+    private static List<NinjaEvent> readXml(String filepath) {
+        List<NinjaEvent> ninjaEvents = new ArrayList<>();
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.parse(Paths.get(filepath).toFile());
+            doc.getDocumentElement().normalize();
+
+            NodeList nodeList = doc.getElementsByTagName("NinjaEvent");
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                Node node = nodeList.item(i);
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
+                    Element element = (Element) node;
+                    NinjaEvent ninjaEvent = new NinjaEvent(
+                            Integer.parseInt(element.getElementsByTagName("id").item(0).getTextContent()),
+                            element.getElementsByTagName("Charaktername").item(0).getTextContent(),
+                            NinjaRank.valueOf(element.getElementsByTagName("Stufe").item(0).getTextContent()),
+                            element.getElementsByTagName("Beschreibung").item(0).getTextContent(),
+                            element.getElementsByTagName("Datum").item(0).getTextContent(),
+                            Double.parseDouble(element.getElementsByTagName("Kraftpunkte").item(0).getTextContent())
+                    );
+                    ninjaEvents.add(ninjaEvent);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Fehler beim Lesen der XML-Datei: " + e.getMessage());
+        }
+        return ninjaEvents;
+    }
+
+
 }
